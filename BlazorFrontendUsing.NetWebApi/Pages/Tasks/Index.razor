@@ -77,7 +77,7 @@ else
     }
     private async Task DeleteTask(int id)
     {
-        await Http.DeleteAsync($"api/tasks/{id}");
-        tasks = await Http.GetFromJsonAsync<List<TaskListitem>>("api/tasks"); // refresh
+        await Http.DeleteAsync($"https://localhost:7291/api/Task/{id}");
+        tasks = await Http.GetFromJsonAsync<List<TaskListitem>>("https://localhost:7291/api/Task"); // refresh
     }
 }

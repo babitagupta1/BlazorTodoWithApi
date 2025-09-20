@@ -1,0 +1,83 @@
+﻿@page "/tasks"
+@using BlazorFrontendUsing.NetWebApi.Models
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<h3>Task List</h3>
+
+<a class="btn btn-primary mb-2" @onclick="() => CreateTask()">
+    ➕ New Task
+</a>
+
+@if (tasks == null)
+{
+    <p>Loading...</p>
+}
+else if (tasks.Count == 0)
+{
+    <p>No tasks found.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Due Date</th>
+                <th>Completed</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in tasks)
+            {
+                <tr>
+                    <td>@task.Title</td>
+                    <td>@task.Description</td>
+                    <td>@task.DueDate?.ToString("yyyy-MM-dd")</td>
+                    <td>@(task.IsCompleted ? "✅" : "❌")</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => EditTask(task.Id)">Edit</button>
+                        <button class="btn btn-success btn-sm" @onclick="() => DetailsTask(task.Id)">Details</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteTask(task.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<TaskListitem> tasks;
+
+
+    // Called automatically when page is opened
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTasks();
+    }
+
+    private async Task LoadTasks()
+    {
+        tasks = await Http.GetFromJsonAsync<List<TaskListitem>>("https://localhost:7291/api/Task");
+    }
+    private void EditTask(int id)
+    {
+        Navigation.NavigateTo($"/tasks/Edit/{id}");
+    }
+
+    private void CreateTask()
+    {
+        Navigation.NavigateTo($"/tasks/Create/");
+    }
+    private void DetailsTask(int id)
+    {
+        Navigation.NavigateTo($"/tasks/Details/{id}");
+    }
+    private async Task DeleteTask(int id)
+    {
+        await Http.DeleteAsync($"api/tasks/{id}");
+        tasks = await Http.GetFromJsonAsync<List<TaskListitem>>("api/tasks"); // refresh
+    }
+}

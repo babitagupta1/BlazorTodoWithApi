@@ -1,0 +1,44 @@
+﻿@page "/tasks/Create"
+@inject HttpClient Http
+@using BlazorFrontendUsing.NetWebApi.Models
+@inject NavigationManager Navigation
+
+<h3>Create Task</h3>
+
+<div class="mb-2">
+    <label>Title</label>
+    <input class="form-control" @bind="task.Title" />
+</div>
+
+<div class="mb-2">
+    <label>Description</label>
+    <textarea class="form-control" @bind="task.Description"></textarea>
+</div>
+
+<div class="mb-2">
+    <label>Due Date</label>
+    <input type="date" class="form-control" @bind="task.DueDate" />
+</div>
+
+<div class="mb-2">
+    <label>Completed</label>
+    <input type="checkbox" @bind="task.IsCompleted" />
+</div>
+
+<button class="btn btn-success" @onclick="Save"> Save</button>
+<button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+
+@code {
+    private TaskListitem task = new();
+
+    private async Task Save()
+    {
+        await Http.PostAsJsonAsync("https://localhost:7291/api/Task", task);
+        Navigation.NavigateTo("/tasks"); // go back to list
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/tasks");
+    }
+}
